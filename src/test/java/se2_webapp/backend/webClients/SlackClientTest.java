@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @ActiveProfiles("local")
 public class SlackClientTest {
-    private static final String BOT_USER_OAUTH_TOKEN = "xoxb-4388825419270-4392540899157-2Bz54mwKgP5MdVRGlO45N7il";
+    private static final String BOT_USER_OAUTH_TOKEN = "";
     private static final String CHANNEL_NAME = "slackalert-app";
     private static final String BASE_URL = "https://slack.com/api/";
     private static final String TEST_MESSAGE = "Hello World from IntelliJ";
