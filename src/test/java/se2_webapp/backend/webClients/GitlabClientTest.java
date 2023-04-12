@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("local")
 public class GitlabClientTest {
     private static final String BASE_URL = "https://git.haw-hamburg.de/api/v4/projects/"; //baseUrl + id + "/"
-    private static final String ACCESS_TOKEN = "GNcAXm7hDmhoCCYxxFZm";
+    private static final String ACCESS_TOKEN = "doesntWorkAnyway";
     private static final int ID = 27565;
     @Autowired
     GitlabClient gitlabClient;
