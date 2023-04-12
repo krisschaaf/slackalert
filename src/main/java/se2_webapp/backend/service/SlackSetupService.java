@@ -30,7 +30,7 @@ public class SlackSetupService {
     //For Testing purposes
     private List<SlackSetup> createSlackSetup() {
         List<SlackSetup> entities = new ArrayList<>();
-        entities.add(new SlackSetup(1L, "max.mockermann@test.de", "slackalert-app", "https://app.slack.com/api/", "xoxb-4388825419270-4392540899157-2Bz54mwKgP5MdVRGlO45N7il"));
+        entities.add(new SlackSetup(1L, "max.mockermann@test.de", "slackalert-app", "https://app.slack.com/api/", null));
         entities.add(new SlackSetup(2L, "fritz.tester@de.de", "allgemein", "https://app.slack.com/api/", null));
         return entities;
     }
