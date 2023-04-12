@@ -1,0 +1,71 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  labels:
+    service: se2-webapp-backend
+  name: se2-webapp-backend
+  namespace: acy642-default
+spec:
+  selector:
+    matchLabels:
+      service: se2-webapp-backend
+  template:
+    metadata:
+      labels:
+        service: se2-webapp-backend
+    spec:
+      containers:
+        - name: se2-webapp-backend-container
+          image: git.haw-hamburg.de:5005/se2_webapp/backend:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+      imagePullSecrets:
+        - name: backend-secret
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    service: se2-webapp-backend
+  name: se2-webapp-backend
+  namespace: acy642-default
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    service: se2-webapp-backend
+  type: ClusterIP
+
+---
+
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: se2-webapp-backend-ingress
+  namespace: acy642-default
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - host: se2-webapp-slackalert.informatik.haw-hamburg.de
+    http:
+      paths:
+      - pathType: Prefix
+        path: /api(/|$)(.*)
+        backend:
+          service:
+            name: se2-webapp-backend
+            port:
+              number: 8080
+  tls: 
+  - hosts:
+    - se2-webapp-slackalert.informatik.haw-hamburg.de
+    secretName: se2-webapp-frontend-ingress-cert

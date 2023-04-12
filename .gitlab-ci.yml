@@ -1,0 +1,58 @@
+stages:
+  - build_and_test
+  - build_and_push_docker
+  - deploy
+
+variables:
+  DOCKER_REPO : git.haw-hamburg.de:5005/se2_webapp/backend
+  IMAGE_TAG: ${DOCKER_REPO}${CI_COMMIT_SHA}
+
+build_and_test:
+  image: maven:3.8.6-openjdk-18-slim
+  stage: build_and_test
+  script:
+    - mvn package
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - target/*.jar
+
+build_and_push_docker:
+  stage: build_and_push_docker
+  tags:
+    - docker
+  services:
+    - docker:dind
+  image: docker:20
+  script:
+    - docker login git.haw-hamburg.de:5005 --username ${DOCKER_USERNAME_HAW} --password ${DOCKER_PASSWORD_HAW}
+    - docker build -t ${IMAGE_TAG} -t ${DOCKER_REPO}:latest .
+    - docker push ${DOCKER_REPO} --all-tags
+    - docker logout
+
+# Deployment in der ICC
+# ---------------------
+deploy_backend:
+  stage: deploy
+  image: bitnami/kubectl:1.21.6
+  dependencies: []
+  environment:
+    name: k8.informatik.haw-hamburg.de
+  script:
+    - kubectl delete -f deployment/deployment.yaml && kubectl apply -f deployment/deployment.yaml
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+#deploy_db:
+#  stage: deploy
+#  image: bitnami/kubectl:1.21.6
+#  dependencies: []
+#  environment:
+#    name: k8.informatik.haw-hamburg.de
+#  script:
+#    - kubectl apply -f deployment/postgres/postgres-configmap.yaml
+#    - kubectl apply -f deployment/postgres/postgres-storage.yaml
+#    - kubectl apply -f deployment/postgres/postgres-deployment.yaml
+#  rules:
+#   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+#   - when: manual
